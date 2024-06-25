@@ -1,26 +1,6 @@
-# PyGolbalInterface
-
-it use raw tcp connections to connects to clients programs any where and allow clients to export functions which can be used by the other clients which connected to main server, client program can be written in any language but it has PyGobalInterface client libary, on test in localhost the communication over head is about 0.00028 ~ 0.00039 secs, with multiple clients, but just make sure that exported function should be thread safe because every function invoke a thread and thread return the function output
-
-`clone this repo.`
-this didn't need any dependency
-
-## Step1
-```shell
-python3 main.py
-```
-## Step2
-```shell
-cd Demo/PythonDemo
-
-# this host client this share a function run_print to networks
-python3 client1.py
-# this client use run_print function from client 1
-python3 client2.py
-```
 # PyGlobalInterface
 
-![PyGlobalInterface Logo](https://yourlogo.com/logo.png)
+<!-- ![PyGlobalInterface Logo](https://yourlogo.com/logo.png) -->
 
 PyGlobalInterface is a TCP-based interface that connects client programs globally, allowing them to export functions that can be used by other connected clients. This cross-language compatible interface leverages the PyGlobalInterface client library, ensuring seamless integration with client programs written in any language. 
 

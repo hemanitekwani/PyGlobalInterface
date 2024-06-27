@@ -3,13 +3,14 @@ from asyncio.queues import Queue
 from asyncio import StreamReader, StreamWriter
 import asyncio
 import json
+from .ClientManager import ClientManager
 
 logger = configure_logger(__name__)
 class Client:
     def __init__(self,stream_reader:StreamReader,stream_writter:StreamWriter,manager) -> None:
         self.connection_client_reader:StreamReader = stream_reader
         self.connection_client_writter:StreamWriter = stream_writter
-        self.manager = manager
+        self.manager:ClientManager = manager
         
         self.__loop = asyncio.get_running_loop()
 
@@ -28,6 +29,8 @@ class Client:
         ## basic log
         addr, port = self.connection_client_writter.get_extra_info('peername')
         logger.info(f"address {addr} and port {port}")
+
+        self.telemetry = False
     async def __sender(self):
         while True:
             data = await self.task_sender_queue.get()
@@ -47,6 +50,12 @@ class Client:
                 logger.info(f"client is register with id: {data.get('client_id')}")
                 await self.manager.add_verify_client(self.client_id,self)
                 await self.task_sender_queue.put({"event":"reg-suc","client_id":data.get('client_id')})
+            elif event == "reg-tel":
+                self.telemetry = True
+                self.client_id = data.get('client_id')
+                logger.info(f"telemetry client is register with id: {data.get('client_id')}")
+                await self.manager.add_verify_client(self.client_id,self)
+                await self.task_sender_queue.put({"event":"reg-tel-suc","client_id":data.get('client_id')})
             elif event == "reg-func":
                 function_name = data.get('function_name')
                 if self.client_id != None:
@@ -63,7 +72,6 @@ class Client:
                 to_client = self.client_id
                 logger.info(f"program: {self.client_id} call this {function_name} function from program {from_client}")
                 await self.manager.call_function_from_another_program(to_client,from_client,function_name,task_id,__data)
-
             elif event == "func-ret":
                 __data:dict = data.get('data')
                 to_client = data.get('to_client')
@@ -72,6 +80,9 @@ class Client:
                 await self.manager.return_function_from_another_program(to_client,__data,task_id)
             elif event == "unreg-cli":
                 self.manager.unregister_client(self.client_id)
+            elif event == "tel-info":
+                if self.telemetry:
+                    pass
     def delete(self):
         self.task_sender_queue.put_nowait({"event":"rm-cli"})
 

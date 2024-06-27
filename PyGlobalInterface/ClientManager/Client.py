@@ -3,14 +3,14 @@ from asyncio.queues import Queue
 from asyncio import StreamReader, StreamWriter
 import asyncio
 import json
-from .ClientManager import ClientManager
+
 
 logger = configure_logger(__name__)
 class Client:
     def __init__(self,stream_reader:StreamReader,stream_writter:StreamWriter,manager) -> None:
         self.connection_client_reader:StreamReader = stream_reader
         self.connection_client_writter:StreamWriter = stream_writter
-        self.manager:ClientManager = manager
+        self.manager = manager
         
         self.__loop = asyncio.get_running_loop()
 

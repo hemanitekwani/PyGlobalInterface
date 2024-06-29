@@ -30,13 +30,21 @@ class Client:
         addr, port = self.connection_client_writter.get_extra_info('peername')
         logger.info(f"address {addr} and port {port}")
 
+        self.funcation_called = 0
+        self.function_return = 0
+
+        self.send = 0
+        self.recv = 0
+
         self.telemetry = False
     async def __sender(self):
         while True:
+            self.send += 1
             data = await self.task_sender_queue.get()
             self.connection_client_writter.write(json.dumps(data).encode())
     async def __recever(self):
         while True:
+            self.recv += 1
             data = json.loads(await self.connection_client_reader.read(4000))
             logger.info(f"receving data from client {data}")
             await self.task_recever_queue.put(data)
@@ -70,14 +78,17 @@ class Client:
                 task_id = data.get('task_id')
                 __data:dict = data.get('data')
                 to_client = self.client_id
+                self.funcation_called += 1
                 logger.info(f"program: {self.client_id} call this {function_name} function from program {from_client}")
                 await self.manager.call_function_from_another_program(to_client,from_client,function_name,task_id,__data)
+
             elif event == "func-ret":
                 __data:dict = data.get('data')
                 to_client = data.get('to_client')
                 task_id = data.get('task_id')
                 logger.info(f"program {self.client_id} return output {__data} task id: {task_id}")
-                await self.manager.return_function_from_another_program(to_client,__data,task_id)
+                self.function_return += 1
+                await self.manager.return_function_from_another_program(self.client_id,to_client,__data,task_id)
             elif event == "unreg-cli":
                 self.manager.unregister_client(self.client_id)
             elif event == "tel-info":

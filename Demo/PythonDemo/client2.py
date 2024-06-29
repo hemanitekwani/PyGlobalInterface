@@ -3,7 +3,7 @@ from asyncio import sleep
 import uuid
 
 
-client = PyGlobalInterface_Client(f"{uuid.uuid4()}")
+client = PyGlobalInterface_Client("program2")
 
 if client.client_register():
     print("sucessful registration")
@@ -11,9 +11,9 @@ if client.client_register():
 
 tasks = []
 for i in range(1000):
-    task = client.loop.create_task(client.call_function("program1@run_print",data={"val":f"hello from {client.client_name}"}))
+    task = client.loop.create_task(client.call_function("program4@run_print",data={"val":f"hello from {client.client_name}"}))
     client.loop.run_until_complete(task)
-
+    
 
 
 

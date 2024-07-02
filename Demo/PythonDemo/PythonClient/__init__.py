@@ -60,6 +60,8 @@ class PyGlobalInterface_Client:
                 self.rm_cli = True
             else:
                 await self.receving_queue.put(data)
+
+
     def __function_runner(self,data:dict):
         __ = time.time()
         output = self.function_register_hashmap.get(data['function_name'])(data["data"])
@@ -97,7 +99,7 @@ class PyGlobalInterface_Client:
             elif data['event'] == "func-reg-err":
                 return False
             return False
-        
+    
     async def call_function(self,function_name:str,data:dict):
         """function: program2@run_function1"""
         client_name,function_name = function_name.split("@")

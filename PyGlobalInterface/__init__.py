@@ -1,6 +1,7 @@
 import asyncio
 from PyGlobalInterface.log import configure_logger
 from PyGlobalInterface.ClientManager import ClientManager, Client
+from concurrent.futures import ThreadPoolExecutor
 logger = configure_logger(__name__)
 class Server:
     def __init__(self,host,port) -> None:
@@ -20,6 +21,7 @@ class Server:
             await server.serve_forever()
     def start(self):
         self.loop = asyncio.new_event_loop()
+        self.loop.set_default_executor(ThreadPoolExecutor(20))
         # await self.client_manager.start()
         try:
             task = self.loop.create_task(self.client_manager.start())

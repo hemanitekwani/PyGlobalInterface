@@ -9,7 +9,9 @@ if client.client_register():
 
 def run_print(data:dict):
     print(data['val'])
-    time.sleep(1)
+    j = 1
+    for i in range(10000000):
+        j+=1
     return {"output":data["val"]}
 if client.func_register("run_print",run_print):
     print("sucessful registration")

@@ -1,4 +1,4 @@
-from PyGlobalInterface.ClientManager.Client import Client
+from PyGlobalInterface.ClientManager import Client
 from PyGlobalInterface.log import configure_logger
 from time import time
 from asyncio import sleep

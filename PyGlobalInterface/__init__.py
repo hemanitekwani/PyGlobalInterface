@@ -2,12 +2,14 @@ import asyncio
 from PyGlobalInterface.log import configure_logger
 from PyGlobalInterface.ClientManager import ClientManager, Client
 from concurrent.futures import ThreadPoolExecutor
+# from .TaskManager import TaskManager
 logger = configure_logger(__name__)
 class Server:
     def __init__(self,host,port) -> None:
         self.host:str = host
         self.port:int = port
         self.client_manager:ClientManager = ClientManager()
+        # self.task_manager = TaskManager()
         
     async def handler(self,rd:asyncio.StreamReader,wr:asyncio.StreamWriter,):
         client:Client = Client(rd,wr,self.client_manager)

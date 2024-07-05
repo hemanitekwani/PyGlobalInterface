@@ -5,11 +5,14 @@ from concurrent.futures import ThreadPoolExecutor
 # from .TaskManager import TaskManager
 logger = configure_logger(__name__)
 class Server:
-    def __init__(self,host,port) -> None:
+    def __init__(self,host,port,number_of_threads=10) -> None:
         self.host:str = host
         self.port:int = port
+        self.number_of_thread:int = number_of_threads
         self.client_manager:ClientManager = ClientManager()
-        # self.task_manager = TaskManager()
+        self.loop = asyncio.new_event_loop()
+        self.loop.set_default_executor(ThreadPoolExecutor(self.number_of_thread))
+        logger.info(f"Task Manager is init with parameter PORT: {self.port}, HOST: {self.host}, THREADS: {self.number_of_thread}")
         
     async def handler(self,rd:asyncio.StreamReader,wr:asyncio.StreamWriter,):
         client:Client = Client(rd,wr,self.client_manager)
@@ -22,14 +25,13 @@ class Server:
         async with self.server as server:
             await server.serve_forever()
     def start(self):
-        self.loop = asyncio.new_event_loop()
-        self.loop.set_default_executor(ThreadPoolExecutor(20))
-        # await self.client_manager.start()
         try:
             task = self.loop.create_task(self.client_manager.start())
             self.loop.run_until_complete(self.__start())
         except KeyboardInterrupt:
+            task.cancel("SERVER IS CLOSING")
             self.loop.close()
             logger.info("STOP server")
+            logger.info("---------------------------------------------")
         except Exception as e:
             logger.error(e)

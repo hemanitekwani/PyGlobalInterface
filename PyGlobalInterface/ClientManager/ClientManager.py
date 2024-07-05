@@ -5,12 +5,14 @@ from asyncio import sleep
 from typing import List, Dict
 import asyncio
 import gc
+from asyncio.queues import Queue
 
 logger = configure_logger(__name__)
 class ClientManager:
     def __init__(self) -> None:
         self.client_stored_for_verfication:List[List[Client,float]] = []
         self.clients_mapping:Dict[str,Client] = dict()
+        self.routeing_queue:Queue = Queue()
         self.clear_verification_stuff_task = None
 
     def add_Client(self,client:Client):
@@ -34,13 +36,14 @@ class ClientManager:
             self.clients_mapping[client_id] = client
             return True
         return False
-    async def call_function_from_another_program(self,to_client:str ,from_client:str,function_name:str,task_id:str,data:dict):
-        client:Client = self.clients_mapping.get(from_client)
+    
+    async def call_function_from_another_program(self,sender:str ,recever:str,function_name:str,task_id:str,data:dict):
+        client:Client = self.clients_mapping.get(recever)
         if client != None:
-            logger.info(f"client with id {from_client} is found and init functino call process")
+            logger.info(f"client with id {recever} is found and init functino call process")
             if client.function_present(function_name):
-                logger.info(f"client with id {from_client} register function {function_name}")
-                return client.call_function(to_client,function_name,data,task_id)
+                logger.info(f"client with id {recever} register function {function_name}")
+                return client.call_function(recever,function_name,data,task_id)
     
     async def return_function_from_another_program(self,to_client:str,data:dict,task_id:str):
         client:Client = self.clients_mapping.get(to_client)

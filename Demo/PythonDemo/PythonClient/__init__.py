@@ -6,6 +6,7 @@ from asyncio.queues import Queue
 from threading import Thread
 from uuid import uuid4
 import time
+from .event import ClientEvent, ManagerEvent
 
 class PyGlobalInterface_Client:
     def __init__(self,client_name:str) -> None:
@@ -41,6 +42,8 @@ class PyGlobalInterface_Client:
             self.connection_status = True
         except:
             self.connection_status = False
+
+
     async def __sender(self):
         while self.connection_status:
             data:dict = await self.sending_queue.get()
@@ -82,10 +85,16 @@ class PyGlobalInterface_Client:
 
     
     def client_register(self):
+        print(self.connection_status)
         if self.connection_status:
-            self.sending_queue.put_nowait({"event":"reg-cli","client_id":self.client_name})
+            self.sending_queue.put_nowait(
+                {
+                    "event":ClientEvent.CLIENT_REGISTER,
+                    "client-name":self.client_name
+                }
+            )
             data = self.loop.run_until_complete(self.receving_queue.get())
-            if data['event'] == "reg-suc":
+            if data['event'] == ClientEvent.CLEINT_FUNCTION_REGISTER_SUCC:
                 return True
             return False
         

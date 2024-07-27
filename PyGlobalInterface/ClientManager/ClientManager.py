@@ -16,17 +16,17 @@ class ClientManager:
         self.client_verify_list:list = []
 
         self.manager_queue:Queue = Queue()
-        self.manager_out_queue:Queue = Queue()
+        # self.manager_out_queue:Queue = Queue()
 
-        clean_task = asyncio.create_task(self.__clean_corotine())
+        
+        # self.stop = False
 
         self.time_delta = 3
     def make_client(self,stream_reader:StreamReader,stream_writter:StreamWriter):
         client = Client(
             stream_reader=stream_reader,
             stream_writter=stream_writter,
-            ManagerQueue=self.manager_queue,
-            ManagerOutQueue=self.manager_out_queue
+            ManagerQueue=self.manager_queue
         )
         self.client_verify_list.append(
             (
@@ -34,20 +34,88 @@ class ClientManager:
                 time()
             )
         )
+        return client
     async def __clean_corotine(self):
         while True:
+            await asyncio.sleep(10)
+            logger.info("CLEAN COROTINE WAKE UP")
             start = time()
             idx = []
             for i,v in enumerate(self.client_verify_list):
                 t,c = v
-                if (start - t) > self.time_delta:
+                if (start - t) > self.time_delta or c.client_name != None:
                     idx.append(i)
             for i in idx[::-1]:
                 self.client_verify_list.pop(i)
-    
+    async def __verify_client(self,name,ref:Client):
+        # TODO: add checks
+        self.client_mapping[name] = ref
+
     async def __process_client(self):
-        while True:
-            pass
+        logger.info("START")
+        try:
+            while True:
+                command = await self.manager_queue.get()
+                "this two were fix for every packet {event:<>,ref:<>}"
+                logger.info(f"DATA: {command}")
+                event:str = command.get("event")
+                ref:Client = command.get("ref")
+                #TODO: find a better way
+                # - fix way of doing
+
+                # TODO: USE MATCH STATEMENT
+                if event == ManagerEvent.CLIENT_VERIFYED:
+                    "ref, name"
+                    try:
+                        self.__verify_client(command.get("client-name"),ref)
+                        await ref.manager_out_queue.put({
+                            "event": ManagerEvent.CLIENT_VERIFYED_SUCC,
+                            "message": "client is succefully verify"
+                        })
+                    except Exception as e:
+                        await ref.manager_out_queue.put({
+                            "event": ManagerEvent.CLIENT_VERIFYED_SUCC,
+                            "message": f"error: {e}"
+                        })
+
+                elif event == ManagerEvent.CLIENT_FUNCTION_CALL:
+                    "function-name, destination-program-name, arguments(base64), task_id"
+                    #TODO: add checks
+                    destination:Client = self.client_mapping.get(event["destination-program-name"])
+                    await destination.manager_out_queue.put({
+                        "event": ManagerEvent.CLIENT_FUNCTION_CALL,
+                        "function-name": command.get('function-name'),
+                        "source-program-name": ref.client_name,
+                        "arguments": command.get("arguments"),
+                        "task-id": command.get("task-id"),
+                        "message": f"calling function {command.get('function-name')}, by {ref.client_name}"
+                    })
+                elif event == ManagerEvent.CLIENT_FUNCTION_RETU:
+                    "function-name, destination-program-name, output(base64), task_id"
+                    destination:Client = self.client_mapping.get(event["destination-program-name"])
+                    await destination.manager_out_queue.put({
+                        "event": ManagerEvent.CLIENT_FUNCTION_RETU,
+                        "function-name": command.get('function-name'),
+                        "source-program-name": ref.client_name,
+                        "output": command.get("output"),
+                        "task-id": command.get("task-id"),
+                        "message": f"calling function {command.get('function-name')}, by {ref.client_name}"
+                    })
+                else:
+                    await ref.manager_out_queue.put({
+                        "event":ManagerEvent.INVALID_EVENT,
+                        "message":"INVALID EVENT COMES"
+                    })
+        except Exception as e:
+            logger.info(f"ERROR: {e}")
+    def stop_all(self):
+        for i in self.client_mapping.keys():
+            self.client_mapping[i].stop()
+
+    async def start(self):
+        await self.__process_client()
+
+
             
 
 

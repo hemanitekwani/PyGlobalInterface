@@ -48,7 +48,7 @@ class Client:
                 if event == ClientEvent.CLIENT_REGISTER:
                     self.client_name = payload["client-name"]
                     await self.manager_queue.put({
-                        "event": ClientEvent.CLEINT_FUNCTION_REGISTER,
+                        "event": ManagerEvent.CLIENT_VERIFYED,
                         "ref": self,
                         "client-name":self.client_name,
                         "message": f"NEW CLIENT REGISTER: {self.client_name}"
@@ -113,11 +113,15 @@ class Client:
     async def check_stop(self):
         logger.info("START")
         while not self.__stop:
-            await asyncio.sleep(30)
+            # print("CLIENT")
+            # print(self.manager_queue)
+            # print("++++++++++++++++++++")
+            await asyncio.sleep(2)
     
 
     def __start(self):
         loop = asyncio.new_event_loop()
+        # self.manager_queue.put_nowait("HELLO")
         recv = loop.create_task(self.__receving_task())
         send = loop.create_task(self.__sender_task())
         proc = loop.create_task(self.__process_signal())

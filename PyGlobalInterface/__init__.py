@@ -30,8 +30,9 @@ class Server:
         try:
             #TODO: fix it
             # t1,t2 = self.client_manager.start()
-            # task1 = self.loop.create_task(t1)
+            task1 = self.loop.create_task(self.client_manager.clean_corotine())
             task2 = self.loop.create_task(self.client_manager.start())
+
             self.loop.run_until_complete(self.__start())
         except KeyboardInterrupt:
             self.client_manager.stop_all()

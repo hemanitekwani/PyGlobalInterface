@@ -127,3 +127,29 @@ class PyGlobalInterface_Client:
         self.recever_task.cancel("time to stop")
         self.function_runner.cancel("time to stop")
 
+class PyGlobalInterfaceClient:
+    def __init__(self,port:int=9800,host:str="127.0.0.1") -> None:
+        self.port = port
+        self.host = host
+
+        self.reader:StreamReader = None
+        self.writter:StreamWriter = None
+        
+        self.connection_status = False
+        
+        self.loop = asyncio.new_event_loop()
+        self.loop.run_until_complete(self.connect())
+        self.client_name:str = None
+
+        self.sending_queue:Queue = Queue()
+        self.receving_queue:Queue = Queue()
+        self.function_call_queue:Queue = Queue()
+
+
+        self.recever_task = self.loop.create_task(self.__sender())
+        self.sender_task = self.loop.create_task(self.__recever())
+        self.function_runner = self.loop.create_task(self.__function_prcessing())
+
+
+        self.function_register_hashmap:dict = dict()
+        self.function_called_task_hashmap:dict = dict()

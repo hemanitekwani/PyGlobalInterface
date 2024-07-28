@@ -16,12 +16,10 @@ class ClientManager:
         self.client_verify_list:list = []
 
         self.manager_queue:Queue = Queue()
-        # self.manager_out_queue:Queue = Queue()
-
-        
-        # self.stop = False
 
         self.time_delta = 3
+
+
     def make_client(self,stream_reader:StreamReader,stream_writter:StreamWriter):
         client = Client(
             stream_reader=stream_reader,
@@ -35,9 +33,10 @@ class ClientManager:
             )
         )
         return client
-    async def __clean_corotine(self):
+    
+    async def clean_corotine(self):
         while True:
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
             logger.info("CLEAN COROTINE WAKE UP")
             start = time()
             idx = []
@@ -47,22 +46,27 @@ class ClientManager:
                     idx.append(i)
             for i in idx[::-1]:
                 self.client_verify_list.pop(i)
+
     async def __verify_client(self,name,ref:Client):
         # TODO: add checks
         self.client_mapping[name] = ref
 
     async def __process_client(self):
         logger.info("START")
+        
         try:
             while True:
-                command = await self.manager_queue.get()
-                "this two were fix for every packet {event:<>,ref:<>}"
-                logger.info(f"DATA: {command}")
-                event:str = command.get("event")
-                ref:Client = command.get("ref")
+                logger.info("start the client queue")
+                try:
+                    command = await self.manager_queue.get()
+                # "this two were fix for every packet {event:<>,ref:<>}"
+                    logger.info(f"DATA: {command}")
+                    event:str = command.get("event")
+                    ref:Client = command.get("ref")
+                except Exception as e:
+                    logger.info(f"ERROR {e}")
                 #TODO: find a better way
                 # - fix way of doing
-
                 # TODO: USE MATCH STATEMENT
                 if event == ManagerEvent.CLIENT_VERIFYED:
                     "ref, name"
@@ -108,6 +112,7 @@ class ClientManager:
                     })
         except Exception as e:
             logger.info(f"ERROR: {e}")
+
     def stop_all(self):
         for i in self.client_mapping.keys():
             self.client_mapping[i].stop()

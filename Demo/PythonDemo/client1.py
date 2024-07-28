@@ -6,7 +6,7 @@ client = PyGlobalInterface_Client("program1")
 
 if client.client_register():
     print("sucessful registration")
-
+client.stop()
 # def run_print(data:dict):
 #     print(data['val'])
 #     j = 1

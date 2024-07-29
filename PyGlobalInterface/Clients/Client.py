@@ -20,10 +20,12 @@ class Client:
        self.client_name = None
        self.buffer_size = 4000
 
-       self.function:set = set()
+       self.__functions:set = set()
        self.__stop = False
 
        self.__thread = Thread(target=self.__start)
+
+    #    self.__function_list:str = []
     async def __sender_task(self):
         logger.info("START")
         "sending queue olny contain dict"
@@ -57,12 +59,13 @@ class Client:
                     
                 elif event == ClientEvent.CLEINT_FUNCTION_REGISTER:
                     function_name = payload["function-name"]
-                    if function_name in self.function:
+                    if function_name in self.__functions:
                         await self.__sending_queue.put({
                             "event": ClientEvent.CLEINT_FUNCTION_REGISTER_FAIL,
                             "message": "FUNCTION IS ALREADY REGISTER"
                         })
                     else:
+                        self.__functions.add(function_name)
                         await self.__sending_queue.put({
                             "event": ClientEvent.CLEINT_FUNCTION_REGISTER_SUCC,
                             "message": "FUNCTION IS REGISTER REGISTER"

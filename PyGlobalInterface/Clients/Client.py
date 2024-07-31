@@ -55,7 +55,7 @@ class Client:
                         "client-name":self.client_name,
                         "message": f"NEW CLIENT REGISTER: {self.client_name}"
                     })
-                    logger.info("PUSH THE REG REQ IN MANAGER QUEUE")
+                    logger.info(f"[{event}][{self.client_name}] request manager to register")
                     
                 elif event == ClientEvent.CLEINT_FUNCTION_REGISTER:
                     function_name = payload["function-name"]

@@ -39,7 +39,7 @@ class Client:
             data:dict = json.loads(await self.stream_reader.read(self.buffer_size))
             logger.info(data)
             await self.__recever_queue.put(data)
-
+    
     async def __process_signal(self):
         logger.info("START")
         try:

@@ -78,7 +78,7 @@ class ClientManager:
                         })
                     except Exception as e:
                         await ref.manager_out_queue.put({
-                            "event": ManagerEvent.CLIENT_VERIFYED_SUCC,
+                            "event": ManagerEvent.CLIENT_VERIFYED_FAIL,
                             "message": f"error: {e}"
                         })
 

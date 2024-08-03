@@ -48,8 +48,20 @@ class ClientManager:
                 self.client_verify_list.pop(i)
 
     async def __verify_client(self,name,ref:Client):
-        # TODO: add checks
-        self.client_mapping[name] = ref
+        if name in self.client_mapping:
+          await ref.manager_out_queue.put({
+              "event": ManagerEvent.CLIENT_VERIFYED_FAIL,
+              "message":"Client already exists"
+               })
+        else:
+            self.client_mapping[name] = ref
+            await ref.manager_out_queue.put({
+                "event":ManagerEvent.CLIENT_VERIFYED_SUCC,
+                "message":"Client successfully"
+
+            })
+
+        
 
     async def __process_client(self):
         logger.info("START")

@@ -47,19 +47,13 @@ class ClientManager:
             for i in idx[::-1]:
                 self.client_verify_list.pop(i)
 
-    async def __verify_client(self,name,ref:Client):
+    async def __verify_client(self,name,ref:Client) -> bool:
         if name in self.client_mapping:
-          await ref.manager_out_queue.put({
-              "event": ManagerEvent.CLIENT_VERIFYED_FAIL,
-              "message":"Client already exists"
-               })
+            return False
+       
         else:
             self.client_mapping[name] = ref
-            await ref.manager_out_queue.put({
-                "event":ManagerEvent.CLIENT_VERIFYED_SUCC,
-                "message":"Client successfully verified"
-
-            })
+            return True
 
         
 
@@ -83,11 +77,18 @@ class ClientManager:
                 if event == ManagerEvent.CLIENT_VERIFYED:
                     "ref, name"
                     try:
-                        self.__verify_client(command.get("client-name"),ref)
-                        await ref.manager_out_queue.put({
+                        verified = await self.__verify_client(command.get("client-name"),ref)
+                        if verified:
+                          await ref.manager_out_queue.put({
                             "event": ManagerEvent.CLIENT_VERIFYED_SUCC,
                             "message": "client is succefully verify"
-                        })
+                          })
+
+                        else:
+                            await ref.manager_out_queue.put({
+                                "event": ManagerEvent.CLIENT_VERIFYED_FAIL,
+                                "message": "Client already exists"
+                            })
                     except Exception as e:
                         await ref.manager_out_queue.put({
                             "event": ManagerEvent.CLIENT_VERIFYED_FAIL,

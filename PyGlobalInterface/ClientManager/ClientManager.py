@@ -57,7 +57,7 @@ class ClientManager:
             self.client_mapping[name] = ref
             await ref.manager_out_queue.put({
                 "event":ManagerEvent.CLIENT_VERIFYED_SUCC,
-                "message":"Client successfully"
+                "message":"Client successfully verified"
 
             })
 

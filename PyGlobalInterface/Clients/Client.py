@@ -47,8 +47,10 @@ class Client:
                 payload:dict = await self.__recever_queue.get()
                 logger.info(f"PAYLOADL: {payload}")
                 event = payload["event"]
+                logger.info(f"Processing event: {event}")
                 if event == ClientEvent.CLIENT_REGISTER:
                     self.client_name = payload["client-name"]
+                    logger.info(f"Client registration initiated: {self.client_name}")
                     await self.manager_queue.put({
                         "event": ManagerEvent.CLIENT_VERIFYED,
                         "ref": self,
@@ -60,17 +62,20 @@ class Client:
                 elif event == ClientEvent.CLEINT_FUNCTION_REGISTER:
                     function_name = payload["function-name"]
                     if function_name in self.__functions:
+                        logger.warning(f"Function already registered: {function_name}")
                         await self.__sending_queue.put({
                             "event": ClientEvent.CLEINT_FUNCTION_REGISTER_FAIL,
                             "message": "FUNCTION IS ALREADY REGISTER"
                         })
                     else:
                         self.__functions.add(function_name)
+                        logger.info(f"Function registered successfully: {function_name}")
                         await self.__sending_queue.put({
                             "event": ClientEvent.CLEINT_FUNCTION_REGISTER_SUCC,
                             "message": "FUNCTION IS REGISTER REGISTER"
                         })
                 elif event == ClientEvent.CLIENT_FUNCTION_CALL:
+                    logger.info(f"Function call requested: {payload['function-name']} with task-id: {payload['task-id']}")
                     await self.manager_queue.put({
                         "event": ManagerEvent.CLIENT_FUNCTION_CALL,
                         "function-name": payload["function-name"],
@@ -80,6 +85,7 @@ class Client:
                         "arguments": payload["arguments"]
                     })
                 elif event == ClientEvent.CLIENT_FUNCTION_RETU:
+                    logger.info(f"Function return requested: {payload['function-name']} with task-id: {payload['task-id']}")
                     await self.manager_queue.put({
                         "event": ManagerEvent.CLIENT_FUNCTION_RETU,
                         "function-name": payload["function-name"],
@@ -93,25 +99,31 @@ class Client:
 
     #TODO: no need of this remove this
     async def __manager_process(self):
-        logger.info("START")
+        logger.info("Manager process START")
         while True:
             payload = await self.manager_out_queue.get()
             event = payload['event']
+            logger.info(f"Processing event: {event}")
             if event == ManagerEvent.CLIENT_VERIFYED_SUCC:
+                    logger.info("Client verification succeeded")
                     await self.__sending_queue.put({
                         "event": ClientEvent.CLEINT_FUNCTION_REGISTER_SUCC,
                         "message": f"CLIENT IS VERIFY"
                     })
             elif event == ManagerEvent.CLIENT_VERIFYED_FAIL:
+                logger.warning("Client verification failed")
                 await self.__sending_queue.put({
                     "event": ClientEvent.CLEINT_FUNCTION_REGISTER_FAIL,
                     "message": f"CLIENT IS NOT VERIFY"
                 })
+                logger.info("Sent CLIENT_FUNCTION_REGISTER_FAIL event")
             elif event == ManagerEvent.CLIENT_FUNCTION_CALL:
                 await self.__sending_queue.put(payload)
+                logger.info("Forwarded CLIENT_FUNCTION_CALL event")
 
             elif event == ManagerEvent.CLIENT_FUNCTION_RETU:
                 await self.__sending_queue.put(payload)
+                logger.info("Forwarded CLIENT_FUNCTION_RETU event")
             
     async def check_stop(self):
         logger.info("START")

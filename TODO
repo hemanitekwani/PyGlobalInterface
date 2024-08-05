@@ -1,2 +1,3 @@
-1. add valid logging statements
-2. make valid disconnection system
+1. refactor client class
+2. data flow digram readme update
+3. verify clean COROTINE

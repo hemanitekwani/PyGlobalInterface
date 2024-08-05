@@ -35,13 +35,15 @@ class ClientManager:
         return client
     
     async def clean_corotine(self):
+        "client_verify_list:list [] run every 5 sec and remove the bud client"
+        #BUG
         while True:
             await asyncio.sleep(5)
             logger.info("CLEAN COROTINE WAKE UP")
             start = time()
             idx = []
             for i,v in enumerate(self.client_verify_list):
-                t,c = v
+                c,t = v
                 if (start - t) > self.time_delta or c.client_name != None:
                     idx.append(i)
             for i in idx[::-1]:
@@ -54,6 +56,7 @@ class ClientManager:
         else:
             self.client_mapping[name] = ref
             return True
+    
 
         
 
@@ -71,9 +74,7 @@ class ClientManager:
                     ref:Client = command.get("ref")
                 except Exception as e:
                     logger.info(f"ERROR {e}")
-                #TODO: find a better way
-                # - fix way of doing
-                # TODO: USE MATCH STATEMENT
+                
                 if event == ManagerEvent.CLIENT_VERIFYED:
                     "ref, name"
                     try:

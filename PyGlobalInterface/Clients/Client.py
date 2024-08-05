@@ -128,9 +128,6 @@ class Client:
     async def check_stop(self):
         logger.info("START")
         while not self.__stop:
-            # print("CLIENT")
-            # print(self.manager_queue)
-            # print("++++++++++++++++++++")
             await asyncio.sleep(2)
     
 

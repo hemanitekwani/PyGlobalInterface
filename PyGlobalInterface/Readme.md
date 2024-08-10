@@ -112,11 +112,10 @@ for i in range(1000):
 client.loop.close()
 
 ```
-![Client Register](PyGlobalInterface/Src/clientregister.png)
+![Client Register](Src/clientregister.png)
+![Function Call](Src/Functioncall.png)
+![Function Register](Src/Functionregister.png)
 
-![Function Call](PyGlobalInterface/Src/Functioncall.png)
-
-![Function Register](PyGlobalInterface/Src/Functionregister.png)
 
 
 ## 📄 License

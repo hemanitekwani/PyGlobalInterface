@@ -112,6 +112,13 @@ for i in range(1000):
 client.loop.close()
 
 ```
+![Client Register](Src/Clientregister.png)
+
+![Function Register](Src/Functionregister.png)
+
+![Function Call](Src/Functioncall.png)
+
+
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

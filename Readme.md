@@ -113,7 +113,7 @@ client.loop.close()
 
 ```
 
-![Client Register](PyGlobalInterface/Src/client_register.png)
+![Client Register](PyGlobalInterface/Src/clientregister.png)
 
 
 

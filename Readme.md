@@ -113,14 +113,9 @@ client.loop.close()
 
 ```
 
-![Client Register](PyGlobalInterface/Src/clientregister.png)
-
-
-
-![Function Register](PyGlobalInterface/Src/Functionregister.png)
-![Function Call](PyGlobalInterface/Src/Functioncall.png)
-
-
+<img src="PyGlobalInterface/Src/clientregister.png" alt="Client Register" width="300"/>
+<img src="PyGlobalInterface/Src/Functionregister.png" alt="Function Register" width="300"/>
+<img src="PyGlobalInterface/Src/Functioncall.png" alt="Function Call" width="300"/>
 
 
 

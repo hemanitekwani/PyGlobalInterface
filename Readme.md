@@ -114,10 +114,10 @@ client.loop.close()
 ```
 
 
-![Alt text](PyGlobalInterface/Src/Clientregister.png)
-
+![Client Register](PyGlobalInterface/Src/Clientregister.png)
 ![Function Register](PyGlobalInterface/Src/Functionregister.png)
 ![Function Call](PyGlobalInterface/Src/Functioncall.png)
+
 
 
 

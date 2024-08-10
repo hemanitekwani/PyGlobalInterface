@@ -113,7 +113,6 @@ client.loop.close()
 
 ```
 
-
 ![Client Register](PyGlobalInterface/Src/Clientregister.png)
 ![Function Register](PyGlobalInterface/Src/Functionregister.png)
 ![Function Call](PyGlobalInterface/Src/Functioncall.png)

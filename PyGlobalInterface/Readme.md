@@ -112,6 +112,12 @@ for i in range(1000):
 client.loop.close()
 
 ```
+![Client Register](PyGlobalInterface/Src/clientregister.png)
+
+![Function Call](PyGlobalInterface/Src/Functioncall.png)
+
+![Function Register](PyGlobalInterface/Src/Functionregister.png)
+
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

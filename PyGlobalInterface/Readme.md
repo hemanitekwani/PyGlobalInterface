@@ -112,10 +112,17 @@ for i in range(1000):
 client.loop.close()
 
 ```
-![Client Register](Src/clientregister.png)
-![Function Call](Src/Functioncall.png)
-![Function Register](Src/Functionregister.png)
+Here’s a visual representation of the client registration process:
 
+<img src="Src/clientregister.png" alt="Client Register" width="300"/>
+
+Here’s a visual representation of the function call process:
+
+<img src="Src/Functioncall.png" alt="Function Call" width="300"/>
+
+Here’s a visual representation of the function registration process:
+
+<img src="Src/Functionregister.png" alt="Function Register" width="300"/>
 
 
 ## 📄 License

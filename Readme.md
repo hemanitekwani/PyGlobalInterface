@@ -112,12 +112,15 @@ for i in range(1000):
 client.loop.close()
 
 ```
+## 📷 Process Visualizations
 
-Client Registration
+### Client Registration
 <img src="PyGlobalInterface/Src/clientregister.png" alt="Client Register" width="300"/>
-function Registration
+
+### Function Registration
 <img src="PyGlobalInterface/Src/Functionregister.png" alt="Function Register" width="300"/>
-function call
+
+### Function Call
 <img src="PyGlobalInterface/Src/Functioncall.png" alt="Function Call" width="300"/>
 
 

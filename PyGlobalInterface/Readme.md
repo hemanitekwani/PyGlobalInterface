@@ -112,6 +112,20 @@ for i in range(1000):
 client.loop.close()
 
 ```
+ client registration process:
+
+<img src="Src/clientregister.png" alt="Client Register" width="300"/>
+
+function registration process:
+
+<img src="Src/Functionregister.png" alt="Function Register" width="300"/>
+
+ function call process
+
+<img src="Src/Functioncall.png" alt="Function Call" width="300"/>
+
+
+
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

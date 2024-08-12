@@ -112,18 +112,18 @@ for i in range(1000):
 client.loop.close()
 
 ```
+## 📷 Process Visualizations
 
-<<<<<<< HEAD
+### Client Registration
 <img src="PyGlobalInterface/Src/clientregister.png" alt="Client Register" width="300"/>
+
+### Function Registration
 <img src="PyGlobalInterface/Src/Functionregister.png" alt="Function Register" width="300"/>
+
+### Function Call
 <img src="PyGlobalInterface/Src/Functioncall.png" alt="Function Call" width="300"/>
-=======
-![Client Register](PyGlobalInterface/Src/client_register.png)
-![Function Register](PyGlobalInterface/Src/Functionregister.png)
-![Function Call](PyGlobalInterface/Src/Functioncall.png)
 
 
->>>>>>> e77d780 (updated readme)
 
 
 

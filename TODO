@@ -5,4 +5,4 @@
 
 4. make a clean up function in handler when process didconect
 5. id client didn't register then dont let it to register function
-6 add log to the clean COROTINE
+6. add log to the clean COROTINE

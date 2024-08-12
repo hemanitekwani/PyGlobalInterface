@@ -3,6 +3,8 @@ from PyGlobalInterface.log import configure_logger
 from PyGlobalInterface.ClientManager import ClientManager, Client
 from concurrent.futures import ThreadPoolExecutor
 import traceback
+import json
+from .Clients.Client import Client
 # from .TaskManager import TaskManager
 logger = configure_logger(__name__)
 class Server:
@@ -14,9 +16,21 @@ class Server:
         
     async def handler(self,rd:asyncio.StreamReader,wr:asyncio.StreamWriter):
         logger.info("SOME THING IS CONNECTED")
-        client = self.client_manager.make_client(rd,wr)
+        client:Client = await self.client_manager.make_client(wr)
         client.start()
-
+        try:
+            while True:
+                try:
+                    data = await rd.read(4000)
+                except Exception as e:
+                    logger.error(f"{e}")
+                data:dict = json.loads(data)
+                logger.info(data)
+                await client.recever_queue.put(data)
+        except Exception as e:
+            logger.error(f"{e}")
+           
+        
     async def __start(self):
         logger.info("SOME THING")
         self.server = await asyncio.start_server(self.handler,self.host,self.port)

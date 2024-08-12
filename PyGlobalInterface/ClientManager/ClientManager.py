@@ -20,9 +20,8 @@ class ClientManager:
         self.time_delta = 3
 
 
-    def make_client(self,stream_reader:StreamReader,stream_writter:StreamWriter):
+    async def make_client(self,stream_writter:StreamWriter):
         client = Client(
-            stream_reader=stream_reader,
             stream_writter=stream_writter,
             ManagerQueue=self.manager_queue
         )
@@ -39,7 +38,7 @@ class ClientManager:
         #BUG
         while True:
             await asyncio.sleep(5)
-            logger.info("CLEAN COROTINE WAKE UP")
+            # logger.info("CLEAN COROTINE WAKE UP")
             start = time()
             idx = []
             for i,v in enumerate(self.client_verify_list):
@@ -74,6 +73,7 @@ class ClientManager:
                     ref:Client = command.get("ref")
                 except Exception as e:
                     logger.info(f"ERROR {e}")
+                    exit(1)
                 
                 if event == ManagerEvent.CLIENT_VERIFYED:
                     "ref, name"
@@ -82,17 +82,20 @@ class ClientManager:
                         if verified:
                           await ref.manager_out_queue.put({
                             "event": ManagerEvent.CLIENT_VERIFYED_SUCC,
+                            "task-id": command.get("task-id"),
                             "message": "client is succefully verify"
                           })
 
                         else:
                             await ref.manager_out_queue.put({
                                 "event": ManagerEvent.CLIENT_VERIFYED_FAIL,
+                                "task-id": command.get("task-id"),
                                 "message": "Client already exists"
                             })
                     except Exception as e:
                         await ref.manager_out_queue.put({
                             "event": ManagerEvent.CLIENT_VERIFYED_FAIL,
+                            "task-id": command.get("task-id"),
                             "message": f"error: {e}"
                         })
 

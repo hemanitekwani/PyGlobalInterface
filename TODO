@@ -1,3 +1,8 @@
-1. refactor client class
-2. data flow digram readme update
-3. verify clean COROTINE
+1. refactor client class DONE
+2. data flow digram readme update PENDING
+3. verify clean COROTINE DONE
+
+
+4. make a clean up function in handler when process didconect
+5. id client didn't register then dont let it to register function
+6 add log to the clean COROTINE

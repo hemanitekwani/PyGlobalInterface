@@ -1,0 +1,49 @@
+2024-08-12 16:11:27.195 INFO {ClientManager} [__process_client] START
+2024-08-12 16:11:27.195 INFO {ClientManager} [__process_client] start the client queue
+2024-08-12 16:11:27.195 INFO {__init__} [__start] SOME THING
+2024-08-12 16:11:27.195 INFO {__init__} [__start] START server with PORT: 9800 and HOST: 0.0.0.0
+2024-08-12 16:11:36.319 INFO {__init__} [handler] SOME THING IS CONNECTED
+2024-08-12 16:11:36.319 INFO {Client} [start] START THREAD
+2024-08-12 16:11:36.320 INFO {__init__} [handler] {'event': 'CLIENT_REGISTER', 'message': 'New Client program4', 'task_id': '7afee60f-b4a2-4de3-a004-f535e1dd6f5a', 'client_name': 'program4'}
+2024-08-12 16:11:36.320 INFO {Client} [__sender_task] START
+2024-08-12 16:11:36.320 INFO {Client} [__process_signal] START
+2024-08-12 16:11:36.320 INFO {Client} [__process_signal] PAYLOADL: {'event': 'CLIENT_REGISTER', 'message': 'New Client program4', 'task_id': '7afee60f-b4a2-4de3-a004-f535e1dd6f5a', 'client_name': 'program4'}
+2024-08-12 16:11:36.320 INFO {Client} [__process_signal] Processing event: CLIENT_REGISTER
+2024-08-12 16:11:36.320 INFO {Client} [__process_signal] Client registration initiated: program4
+2024-08-12 16:11:36.320 INFO {Client} [__process_signal] [CLIENT_REGISTER][program4] request manager to register
+2024-08-12 16:11:36.320 INFO {Client} [__manager_process] Manager process START
+2024-08-12 16:11:36.320 INFO {Client} [check_stop] START
+2024-08-12 16:11:37.197 INFO {ClientManager} [__process_client] DATA: {'event': 'CLIENT_VERIFYED', 'ref': <PyGlobalInterface.Clients.Client.Client object at 0x7f9882c77e50>, 'task-id': '7afee60f-b4a2-4de3-a004-f535e1dd6f5a', 'client-name': 'program4', 'message': 'NEW CLIENT REGISTER: program4'}
+2024-08-12 16:11:37.197 INFO {ClientManager} [__process_client] start the client queue
+2024-08-12 16:11:38.322 INFO {Client} [__manager_process] Processing event: CLIENT_VERIFYED_SUCC
+2024-08-12 16:11:38.322 INFO {Client} [__manager_process] Client verification succeeded
+2024-08-12 16:11:38.322 INFO {Client} [__sender_task] SENDING DATA: {'event': 'CLIENT_REGISTER_SUCC', 'task-id': '7afee60f-b4a2-4de3-a004-f535e1dd6f5a', 'message': 'CLIENT IS VERIFY'}
+2024-08-12 16:11:38.824 INFO {__init__} [handler] {'event': 'CLEINT_FUNCTION_REGISTER', 'message': 'New Function is register run', 'task_id': '6c52b06b-a23b-4ccf-9312-f435c20785ff', 'function_name': 'run'}
+2024-08-12 16:11:40.324 INFO {Client} [__process_signal] PAYLOADL: {'event': 'CLEINT_FUNCTION_REGISTER', 'message': 'New Function is register run', 'task_id': '6c52b06b-a23b-4ccf-9312-f435c20785ff', 'function_name': 'run'}
+2024-08-12 16:11:40.325 INFO {Client} [__process_signal] Processing event: CLEINT_FUNCTION_REGISTER
+2024-08-12 16:11:40.325 INFO {Client} [__process_signal] Function registered successfully: run
+2024-08-12 16:11:40.325 INFO {Client} [__sender_task] SENDING DATA: {'event': 'CLEINT_FUNCTION_REGISTER_SUCC', 'task-id': '6c52b06b-a23b-4ccf-9312-f435c20785ff', 'message': 'FUNCTION IS REGISTER REGISTER'}
+2024-08-12 16:11:40.336 ERROR {__init__} [handler] Expecting value: line 1 column 1 (char 0)
+2024-08-12 16:11:56.051 INFO {__init__} [handler] SOME THING IS CONNECTED
+2024-08-12 16:11:56.051 INFO {Client} [start] START THREAD
+2024-08-12 16:11:56.052 INFO {Client} [__sender_task] START
+2024-08-12 16:11:56.052 INFO {Client} [__process_signal] START
+2024-08-12 16:11:56.052 INFO {__init__} [handler] {'event': 'CLIENT_REGISTER', 'message': 'New Client program4', 'task_id': '9d8343cb-30de-40c2-b5b3-0311e114deea', 'client_name': 'program4'}
+2024-08-12 16:11:56.052 INFO {Client} [__manager_process] Manager process START
+2024-08-12 16:11:56.052 INFO {Client} [check_stop] START
+2024-08-12 16:11:56.052 INFO {Client} [__process_signal] PAYLOADL: {'event': 'CLIENT_REGISTER', 'message': 'New Client program4', 'task_id': '9d8343cb-30de-40c2-b5b3-0311e114deea', 'client_name': 'program4'}
+2024-08-12 16:11:56.053 INFO {Client} [__process_signal] Processing event: CLIENT_REGISTER
+2024-08-12 16:11:56.053 INFO {Client} [__process_signal] Client registration initiated: program4
+2024-08-12 16:11:56.053 INFO {Client} [__process_signal] [CLIENT_REGISTER][program4] request manager to register
+2024-08-12 16:11:57.211 INFO {ClientManager} [__process_client] DATA: {'event': 'CLIENT_VERIFYED', 'ref': <PyGlobalInterface.Clients.Client.Client object at 0x7f9882c890d0>, 'task-id': '9d8343cb-30de-40c2-b5b3-0311e114deea', 'client-name': 'program4', 'message': 'NEW CLIENT REGISTER: program4'}
+2024-08-12 16:11:57.211 INFO {ClientManager} [__process_client] start the client queue
+2024-08-12 16:11:58.055 INFO {Client} [__manager_process] Processing event: CLIENT_VERIFYED_FAIL
+2024-08-12 16:11:58.055 WARNING {Client} [__manager_process] Client verification failed
+2024-08-12 16:11:58.055 INFO {Client} [__manager_process] Sent CLIENT_FUNCTION_REGISTER_FAIL event
+2024-08-12 16:11:58.055 INFO {Client} [__sender_task] SENDING DATA: {'event': 'CLIENT_REGISTER_FAIL', 'task-id': '9d8343cb-30de-40c2-b5b3-0311e114deea', 'message': 'CLIENT IS NOT VERIFY'}
+2024-08-12 16:11:58.555 INFO {__init__} [handler] {'event': 'CLEINT_FUNCTION_REGISTER', 'message': 'New Function is register run', 'task_id': 'ad47e703-05ab-4168-835d-3820017badd2', 'function_name': 'run'}
+2024-08-12 16:12:00.057 INFO {Client} [__process_signal] PAYLOADL: {'event': 'CLEINT_FUNCTION_REGISTER', 'message': 'New Function is register run', 'task_id': 'ad47e703-05ab-4168-835d-3820017badd2', 'function_name': 'run'}
+2024-08-12 16:12:00.057 INFO {Client} [__process_signal] Processing event: CLEINT_FUNCTION_REGISTER
+2024-08-12 16:12:00.057 INFO {Client} [__process_signal] Function registered successfully: run
+2024-08-12 16:12:00.057 INFO {Client} [__sender_task] SENDING DATA: {'event': 'CLEINT_FUNCTION_REGISTER_SUCC', 'task-id': 'ad47e703-05ab-4168-835d-3820017badd2', 'message': 'FUNCTION IS REGISTER REGISTER'}
+2024-08-12 16:12:00.571 ERROR {__init__} [handler] Expecting value: line 1 column 1 (char 0)

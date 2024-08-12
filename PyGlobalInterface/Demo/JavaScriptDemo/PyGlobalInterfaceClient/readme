@@ -1,0 +1,8 @@
+# PyGlobalInterface_Client
+
+A client library for interacting with the PyGlobalInterface server.
+
+## Installation
+
+```sh
+npm install pyglobal-interface-client

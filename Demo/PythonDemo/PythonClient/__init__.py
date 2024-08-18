@@ -3,134 +3,12 @@ from asyncio import StreamReader, StreamWriter
 import asyncio
 import json
 from asyncio.queues import Queue
-from threading import Thread
-from uuid import uuid4
 import time
 from .event import ClientEvent, ManagerEvent
-
-class PyGlobalInterface_Client:
-    def __init__(self,client_name:str) -> None:
-        self.port = 9800
-        self.host = "127.0.0.1"
-        self.reader:StreamReader = None
-        self.writter:StreamWriter = None
-        self.connection_status = False
-        self.loop = asyncio.new_event_loop()
-        self.loop.run_until_complete(self.connect())
-        self.client_name:str = client_name
-
-        self.sending_queue:Queue = Queue()
-        self.receving_queue:Queue = Queue()
-        self.function_call_queue:Queue = Queue()
-
-
-        self.recever_task = self.loop.create_task(self.__sender())
-        self.sender_task = self.loop.create_task(self.__recever())
-        self.function_runner = self.loop.create_task(self.__function_prcessing())
-
-
-        self.function_register_hashmap:dict = dict()
-
-        self.function_called_task_hashmap:dict = dict()
-
-        self.rm_cli = False
-
-        self.thread_list = []
-    async def connect(self):
-        try:
-            self.reader,self.writter = await open_connection(host=self.host,port=self.port)
-            self.connection_status = True
-        except:
-            self.connection_status = False
-
-
-    async def __sender(self):
-        while self.connection_status:
-            data:dict = await self.sending_queue.get()
-            print(f"sending data: {data}")
-            self.writter.write(json.dumps(data).encode())
-            
-    async def __recever(self):
-        while self.connection_status:
-            data:dict = json.loads(await self.reader.read(4000))
-            print(f"receving from {data}")
-            if data['event'] == "func-call":
-                await self.function_call_queue.put(data)
-            elif data['event'] == "func-ret":
-                # print(data)
-                self.function_called_task_hashmap[data['task_id']] = data['data']
-            elif data['event'] == "rm-cli":
-                self.rm_cli = True
-            else:
-                await self.receving_queue.put(data)
-
-
-    def __function_runner(self,data:dict):
-        __ = time.time()
-        output = self.function_register_hashmap.get(data['function_name'])(data["data"])
-        print(output)
-        print( time.time() -__ )
-        self.sending_queue.put_nowait({"event":"func-ret","data":output,"to_client":data["to_client"],"task_id":data['task_id']})
-    
-    async def __function_prcessing(self):
-        while True:
-            data:dict = await self.function_call_queue.get()
-            async def __task(data):
-                thread = Thread(target=self.__function_runner,args=(data,))
-                thread.start()
-                while thread.is_alive():
-                    await asyncio.sleep(0.005)
-            self.thread_list.append(self.loop.create_task(__task(data)))
-            
-
-    
-    def client_register(self):
-        print(self.connection_status)
-        if self.connection_status:
-            self.sending_queue.put_nowait(
-                {
-                    "event":ClientEvent.CLIENT_REGISTER,
-                    "client-name":self.client_name
-                }
-            )
-            data = self.loop.run_until_complete(self.receving_queue.get())
-            if data['event'] == ClientEvent.CLEINT_FUNCTION_REGISTER_SUCC:
-                return True
-            return False
-        
-    def func_register(self,function_name:str,function_ref):
-        if self.connection_status:
-            self.function_register_hashmap[function_name] = function_ref
-            self.sending_queue.put_nowait({"event":"reg-func","function_name":function_name})
-            data = self.loop.run_until_complete(self.receving_queue.get())
-            if data['event'] == "func-reg-suc":
-                return True
-            elif data['event'] == "func-reg-err":
-                return False
-            return False
-    
-    async def call_function(self,function_name:str,data:dict):
-        """function: program2@run_function1"""
-        client_name,function_name = function_name.split("@")
-        task_id = str(uuid4())
-        self.function_called_task_hashmap[task_id] = None
-        await self.sending_queue.put({"event":"func-call","from_client":client_name,"data":data,"task_id":task_id,"function_name":function_name})
-        while self.function_called_task_hashmap[task_id] == None:
-            await asyncio.sleep(0.03)
-        return self.function_called_task_hashmap[task_id]
-    
-    def stop(self):
-        self.sending_queue.put_nowait({"event":"unreg-cli","client_name":self.client_name})
-        while not self.rm_cli:
-            time.sleep(0.3)
-        self.sender_task.cancel("time to stop")
-        self.recever_task.cancel("time to stop")
-        self.function_runner.cancel("time to stop")
-
-
 from .tasks import  Task, TaskStatus, RegisterClient, RegisterFunction, FunctinoCall, FunctionReturn
 from uuid import uuid4
 from typing import Dict
+from .executer import FunctionRegistry, Function
 class BaseClient:
     def __init__(self,host:str,port:int) -> None:
         self.port = port
@@ -188,7 +66,19 @@ class BaseClient:
 class CServer(BaseClient):
     def __init__(self, host: str, port: int) -> None:
         super().__init__(host, port)
+        self.FunctionRegistry = FunctionRegistry(self.sending_queue)
+        self.push_data = asyncio.create_task(self.FunctionRegistry.function_data_push())
         
+    async def run_forver(self):
+        try:
+            while True:
+                try:
+                    await asyncio.sleep(1.5)
+                except asyncio.exceptions.CancelledError:
+                    print("CLIENT IS CLOSING")
+                    exit(0)
+        except Exception as e:
+            print(e)
 
     async def process_request(self, data: dict):
         _event = data.get("event")
@@ -204,8 +94,12 @@ class CServer(BaseClient):
             self.tasks[_task_id].status = TaskStatus.END
         
         elif _event == ClientEvent.CLIENT_FUNCTION_CALL:
-            pass
-   
+            task = FunctinoCall(data["function-name"],data["source-program-name"],data["arguments"])
+            task.task_id = _task_id
+            self.FunctionRegistry.run_function(task)
+        
+        elif _event == ClientEvent.CLIENT_FUNCTION_RETU:
+            self.tasks[_task_id].status = TaskStatus.END
         
     async def register(self,client_name:str):
         task_id, task = Task.create(RegisterClient(client_name))
@@ -216,7 +110,7 @@ class CServer(BaseClient):
                 return True
             elif self.tasks[task_id].status == TaskStatus.ERROR:
                 return False
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
     
     async def register_function(self,function_name:str,function):
         task_id, task = Task.create(RegisterFunction(function_name))
@@ -224,7 +118,25 @@ class CServer(BaseClient):
         await self.start_task(task)
         while True:
             if self.tasks[task_id].status == TaskStatus.END:
+                self.FunctionRegistry.register_function(function_name,function)
                 return True
             elif self.tasks[task_id].status == TaskStatus.ERROR:
                 return False
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.1)
+    async def functionCall(self,function,arguments):
+        "program-id@function-name"
+        prgram_id,function_name = function.split("@")
+        task_id,task = Task.create(FunctinoCall(
+            function_name=function_name,
+            destination_program_name=prgram_id,
+            arguments=arguments
+        ))
+        self.register_task(task_id,task)
+        await self.start_task(task)
+        while True:
+            if self.tasks[task_id].status == TaskStatus.END:
+                self.FunctionRegistry.register_function(function_name,function)
+                return True
+            elif self.tasks[task_id].status == TaskStatus.ERROR:
+                return False
+            await asyncio.sleep(0.1)

@@ -8,11 +8,10 @@ def run(data):
 async def main():
     client = CServer('0.0.0.0',9800)
     await client.connect()
-    if await client.register("program_iomm"):
+    if await client.register("program10"):
         print("SUCCEFUL")
     
-    if await client.register_function("run",run):
-        print("run function")
+    await client.functionCall("program1@run","{'hello':'1'}")
     await client.run_forver()
 
 asyncio.run(main())

@@ -19,6 +19,7 @@ class Server:
         client:Client = await self.client_manager.make_client(wr)
         client.start()
         try:
+            # CLIENT RECEVER TASK
             while True:
                 try:
                     data = await rd.read(4000)
@@ -26,7 +27,8 @@ class Server:
                     logger.error(f"{e}")
                 data:dict = json.loads(data)
                 logger.info(data)
-                await client.recever_queue.put(data)
+
+                await client.process_signal(data)
         except Exception as e:
             logger.error(f"{e}")
            

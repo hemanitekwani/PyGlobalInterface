@@ -21,13 +21,18 @@ class Function(Thread):
         self.__output = None
         self.status = None
         self.task:Task = None
-    def start(self,arguments):
+    def _start(self,arguments):
         self.status = FunctionStatus.START
-        self.arguments = json.loads(arguments)
+        print(arguments)
+        self.arguments = arguments
+        self.start()
+        return self
     def run(self) -> None:
+        print(f"FUNCTION start executing: {self.function_name}")
         try:
             self.status = FunctionStatus.WAIT
-            self.__output = self.function_Ref(**self.arguments())
+            self.__output = self.function_Ref(self.arguments)
+            print("GOT OUTPUT")
         except Exception as e:
             self.status = FunctionStatus.ERROR
             print(e)
@@ -37,27 +42,31 @@ class Function(Thread):
             self.status = None
             return json.dumps(self.__output)
         return ""
-
+def MakeFuntionThread(function:Function)-> Function:
+    return Function(function.function_name,function.function_Ref)
 class FunctionRegistry:
-    def __init__(self,sender_queue:Queue) -> None:
+    def __init__(self,sender_queue:Queue,delta:float) -> None:
         self.__registry:Dict[str,Function] = dict()
         self.sender_queue = sender_queue
         self.thread_pool:List[Function] = list()
+        self.delta = delta
     
     def register_function(self,function_name,function_ref):
         self.__registry[function_name] = Function(function_name,function_ref)
         
 
     def run_function(self,task:Task):
+        print(f"TASK: {task}")
         function_name = task.task.function_name
         arguments = task.task.arguments
 
         function = self.__registry.get(function_name)
         
         if function:
-            function = deepcopy(function)
+            print(f"PREPRALING FOR LAUNCING FUNCTION {function.function_name}")
+            function = MakeFuntionThread(function)
             function.task = task
-            self.thread_pool.append(deepcopy(function).start(arguments))
+            self.thread_pool.append(function._start(arguments))
             return True
         return False
     
@@ -70,4 +79,4 @@ class FunctionRegistry:
                     _, task = Task.create(FunctionReturn(val.function_name,_task.destination_program_name,val.get_output())) 
                     task.task.task_id = _task.task_id
                     await self.sender_queue.put(task)
-            await asyncio.sleep(0.6)
+            await asyncio.sleep(self.delta)

@@ -29,7 +29,6 @@ class Client:
         "sending queue olny contain dict"
         while True:
             try:
-                
                 data = await self.__sending_queue.get()
                 logger.info(f"SENDING DATA: {data}")
                 data:bytes = json.dumps(data).encode()
@@ -41,9 +40,8 @@ class Client:
                 
     
     async def process_signal(self, payload):
-        logger.info("START")
         try:
-            logger.info(f"PAYLOADL: {payload}")
+            logger.info(f"PAYLOAD: {payload}")
 
             # every payload have three part [event:str, data:str, message:str]
             event = payload["event"]
@@ -155,13 +153,12 @@ class Client:
         logger.info("START")
         while not self.__stop:
             # logger.info("CHECK FOR STOP")
-            await asyncio.sleep(2)
+            await asyncio.sleep(0.00001)
     
 
     def __start(self):
         loop = asyncio.new_event_loop()
-        # self.manager_queue.put_nowait("HELLO")
-        # recv = loop.create_task(self.__receving_task())
+
         send = loop.create_task(self.__sender_task())
         proc_out = loop.create_task(self.__manager_process())
         

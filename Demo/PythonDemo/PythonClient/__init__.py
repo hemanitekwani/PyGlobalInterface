@@ -21,6 +21,7 @@ class BaseClient:
         self.sender_task = None
         self.recever_task = None
         self.tasks:Dict[str,Task] = dict()
+        self.delta = 0.00001
     async def connect(self):
         try:
             self.reader, self.writter = await open_connection(host=self.host,port=self.port)
@@ -66,14 +67,14 @@ class BaseClient:
 class CServer(BaseClient):
     def __init__(self, host: str, port: int) -> None:
         super().__init__(host, port)
-        self.FunctionRegistry = FunctionRegistry(self.sending_queue)
+        self.FunctionRegistry = FunctionRegistry(self.sending_queue,self.delta)
         self.push_data = asyncio.create_task(self.FunctionRegistry.function_data_push())
         
     async def run_forver(self):
         try:
             while True:
                 try:
-                    await asyncio.sleep(1.5)
+                    await asyncio.sleep(self.delta)
                 except asyncio.exceptions.CancelledError:
                     print("CLIENT IS CLOSING")
                     exit(0)
@@ -94,8 +95,8 @@ class CServer(BaseClient):
             self.tasks[_task_id].status = TaskStatus.END
         
         elif _event == ClientEvent.CLIENT_FUNCTION_CALL:
-            task = FunctinoCall(data["function-name"],data["source-program-name"],data["arguments"])
-            task.task_id = _task_id
+            _, task = Task.create(FunctinoCall(data["function-name"],data["source-program-name"],data["arguments"]))
+            task.task.task_id = _task_id
             self.FunctionRegistry.run_function(task)
         
         elif _event == ClientEvent.CLIENT_FUNCTION_RETU:
@@ -110,7 +111,7 @@ class CServer(BaseClient):
                 return True
             elif self.tasks[task_id].status == TaskStatus.ERROR:
                 return False
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(self.delta)
     
     async def register_function(self,function_name:str,function):
         task_id, task = Task.create(RegisterFunction(function_name))
@@ -122,7 +123,7 @@ class CServer(BaseClient):
                 return True
             elif self.tasks[task_id].status == TaskStatus.ERROR:
                 return False
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(self.delta)
     async def functionCall(self,function,arguments):
         "program-id@function-name"
         prgram_id,function_name = function.split("@")
@@ -139,4 +140,4 @@ class CServer(BaseClient):
                 return True
             elif self.tasks[task_id].status == TaskStatus.ERROR:
                 return False
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(self.delta)

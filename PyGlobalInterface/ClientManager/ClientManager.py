@@ -8,6 +8,7 @@ from asyncio import StreamReader, StreamWriter
 from asyncio import Queue
 from PyGlobalInterface.Clients.Client import Client
 from PyGlobalInterface.Clients.Events import ManagerEvent
+import traceback
 
 logger = configure_logger(__name__)
 class ClientManager:
@@ -102,7 +103,7 @@ class ClientManager:
                 elif event == ManagerEvent.CLIENT_FUNCTION_CALL:
                     "function-name, destination-program-name, arguments(base64), task_id"
                     #TODO: add checks
-                    destination:Client = self.client_mapping.get(event["destination-program-name"])
+                    destination:Client = self.client_mapping.get(command["destination-program-name"])
                     await destination.manager_out_queue.put({
                         "event": ManagerEvent.CLIENT_FUNCTION_CALL,
                         "function-name": command.get('function-name'),
@@ -113,7 +114,7 @@ class ClientManager:
                     })
                 elif event == ManagerEvent.CLIENT_FUNCTION_RETU:
                     "function-name, destination-program-name, output(base64), task_id"
-                    destination:Client = self.client_mapping.get(event["destination-program-name"])
+                    destination:Client = self.client_mapping.get(command["destination-program-name"])
                     await destination.manager_out_queue.put({
                         "event": ManagerEvent.CLIENT_FUNCTION_RETU,
                         "function-name": command.get('function-name'),
@@ -129,6 +130,7 @@ class ClientManager:
                     })
         except Exception as e:
             logger.info(f"ERROR: {e}")
+            logger.info(traceback.format_exc())
 
     def stop_all(self):
         for i in self.client_mapping.keys():
